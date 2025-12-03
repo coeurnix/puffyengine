@@ -1,9 +1,12 @@
 # PuffyEngine
 
-PuffyEngine is a tiny (< 400 KB) single-file C++ launcher that embeds a Chromium-based Steam HTMLSurface browser in a native Windows window and serves your web game from a local HTTP server.  
-Created by **@coeurnix**, licensed under the **Boost Software License 1.0**.
+PuffyEngine is a tiny (< 400 KB) single-file C++ launcher that embeds a Chromium-based Steam HTMLSurface browser in a native Windows window with keyboard, mouse, and gamepad support. Because it uses Steam’s Chromium layer, you get many modern browser features (HTML5, CSS, JavaScript, audio/video, etc.) without shipping a big runtime yourself.
 
-> **Status:** Windows only • Steam required and must be running
+Created by coeurnix, licensed under the **Boost Software License 1.0**.
+
+## Requirements
+- Windows only
+- Steam required and must be running (i.e. suitable for making Steam games)
 
 ---
 
@@ -15,7 +18,6 @@ Created by **@coeurnix**, licensed under the **Boost Software License 1.0**.
 - Forwards keyboard, mouse, and XInput gamepad to the web page.
 - Exposes Steam features (achievements, stats, cloud saves) to JavaScript via a simple alert-based bridge.
 
-Because it uses Steam’s Chromium layer, you get many modern browser features (HTML5, CSS, JavaScript, audio/video, etc.) without shipping a big runtime yourself.
 
 ---
 
