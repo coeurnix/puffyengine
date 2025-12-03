@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PuffyEngine Demo Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #00d9ff;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .panel h2 {
+            color: #00d9ff;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: linear-gradient(180deg, #00d9ff 0%, #0099cc 100%);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.danger {
+            background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
+        }
+
+        button.success {
+            background: linear-gradient(180deg, #44ff88 0%, #00cc44 100%);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .log {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry.info {
+            color: #00d9ff;
+        }
+
+        .log-entry.success {
+            color: #44ff88;
+        }
+
+        .log-entry.error {
+            color: #ff4444;
+        }
+
+        .log-entry.data {
+            color: #ffaa00;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #444;
+        }
+
+        .status-dot.active {
+            background: #44ff88;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎮 PuffyEngine Demo</h1>
+    <p class="subtitle">Steam HTMLSurface Web Game Engine</p>
+
+    <div class="panel">
+        <h2>🖥️ Window Controls</h2>
+        <div class="button-row">
+            <button onclick="Puffy.setFullscreen(true)">Enter Fullscreen</button>
+            <button onclick="Puffy.setFullscreen(false)">Exit Fullscreen</button>
+        </div>
+        <div class="button-row">
+            <button onclick="Puffy.setCursorVisible(false)">Hide Cursor</button>
+            <button onclick="Puffy.setCursorVisible(true)">Show Cursor</button>
+        </div>
+        <div class="button-row">
+            <button class="danger" onclick="Puffy.exit()">Exit Application</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>🏆 Steam Achievements</h2>
+        <div class="input-row">
+            <input type="text" id="achievementName" placeholder="Achievement API Name" value="ACH_FIRST_GAME">
+            <button class="success" onclick="grantAchievement()">Grant Achievement</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>📊 Steam Stats</h2>
+        <div class="input-row">
+            <input type="text" id="statName" placeholder="Stat API Name" value="GAMES_PLAYED">
+            <input type="number" id="statValue" placeholder="Value" value="1">
+            <button onclick="setStat()">Set Stat</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>☁️ Steam Cloud Save</h2>
+        <div class="input-row">
+            <input type="text" id="saveFilename" placeholder="Filename" value="savegame.json">
+        </div>
+        <textarea id="saveData"
+            placeholder="Save data (will be stored as a string)">{"level": 5, "score": 12500, "inventory": ["sword", "shield"]}</textarea>
+        <div class="button-row">
+            <button class="success" onclick="cloudSave()">Save to Cloud</button>
+            <button onclick="cloudLoad()">Load from Cloud</button>
+            <button class="danger" onclick="cloudDelete()">Delete Save</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>📝 Event Log</h2>
+        <div class="log" id="log"></div>
+    </div>
+
+    <div class="panel">
+        <h2>🎮 Input Status</h2>
+        <div class="status">
+            <div class="status-item">
+                <div class="status-dot" id="mouseStatus"></div>
+                <span>Mouse</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="keyboardStatus"></div>
+                <span>Keyboard</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="gamepadStatus"></div>
+                <span>Gamepad</span>
+            </div>
+        </div>
+        <p style="margin-top: 10px; font-size: 0.9em; color: #888;">
+            Last key: <span id="lastKey">-</span> |
+            Mouse: <span id="mousePos">0, 0</span>
+        </p>
+    </div>
+
+    <script>
+        /**
+         * Puffy JavaScript Bridge API
+         * 
+         * These functions communicate with the native PuffyEngine through
+         * JavaScript alert() calls prefixed with "puffy:".
+         */
+        const Puffy = {
+            /**
+             * Exit the application cleanly
+             */
+            exit: function () {
+                log('Requesting application exit...', 'info');
+                alert('puffy:exit');
+            },
+
+            /**
+             * Toggle fullscreen mode
+             * @param {boolean} enabled - true for fullscreen, false for windowed
+             */
+            setFullscreen: function (enabled) {
+                log(`Setting fullscreen: ${enabled}`, 'info');
+                alert(`puffy:setFullscreen(${enabled})`);
+            },
+
+            /**
+             * Toggle cursor visibility
+             * @param {boolean} visible - true to show cursor, false to hide
+             */
+            setCursorVisible: function (visible) {
+                log(`Setting cursor visible: ${visible}`, 'info');
+                alert(`puffy:setCursorVisible(${visible})`);
+            },
+
+            /**
+             * Grant a Steam achievement
+             * @param {string} achievementName - The API name of the achievement
+             */
+            grantAchievement: function (achievementName) {
+                log(`Granting achievement: ${achievementName}`, 'success');
+                alert(`puffy:grantSteamAchievement("${achievementName}")`);
+            },
+
+            /**
+             * Set a Steam stat value
+             * @param {string} statName - The API name of the stat
+             * @param {number} value - The value to set (int or float)
+             */
+            setStat: function (statName, value) {
+                log(`Setting stat ${statName} = ${value}`, 'info');
+                alert(`puffy:grantSteamStat("${statName}", ${value})`);
+            },
+
+            /**
+             * Request a cloud save file. The callback will receive the file contents
+             * or null if the file doesn't exist.
+             * @param {string} filename - The cloud save filename
+             * @param {string} callbackName - Name of the global callback function
+             */
+            requestCloudSave: function (filename, callbackName) {
+                log(`Requesting cloud save: ${filename}`, 'info');
+                alert(`puffy:requestSteamCloudSave("${filename}", "${callbackName}")`);
+            },
+
+            /**
+             * Save data to Steam Cloud
+             * @param {string} filename - The cloud save filename
+             * @param {string} data - The data to save (as a string)
+             */
+            saveToCloud: function (filename, data) {
+                log(`Saving to cloud: ${filename} (${data.length} bytes)`, 'success');
+                alert(`puffy:saveToSteamCloudSave("${filename}", "${data}")`);
+            },
+
+            /**
+             * Delete a cloud save file
+             * @param {string} filename - The cloud save filename to delete
+             */
+            removeCloudSave: function (filename) {
+                log(`Removing cloud save: ${filename}`, 'error');
+                alert(`puffy:removeSteamCloudSave("${filename}")`);
+            }
+        };
+
+        // Global callback for cloud save loading
+        window.onCloudSaveLoaded = function (data) {
+            if (data === null) {
+                log('Cloud save not found or empty', 'error');
+                document.getElementById('saveData').value = '';
+            } else {
+                log(`Cloud save loaded: ${data.length} bytes`, 'success');
+                document.getElementById('saveData').value = data;
+            }
+        };
+
+        // UI helper functions
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const time = new Date().toLocaleTimeString();
+            entry.textContent = `[${time}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function grantAchievement() {
+            const name = document.getElementById('achievementName').value.trim();
+            if (name) {
+                Puffy.grantAchievement(name);
+            }
+        }
+
+        function setStat() {
+            const name = document.getElementById('statName').value.trim();
+            const value = parseFloat(document.getElementById('statValue').value);
+            if (name && !isNaN(value)) {
+                Puffy.setStat(name, value);
+            }
+        }
+
+        function cloudSave() {
+            const filename = document.getElementById('saveFilename').value.trim();
+            const data = document.getElementById('saveData').value;
+            if (filename) {
+                Puffy.saveToCloud(filename, data);
+            }
+        }
+
+        function cloudLoad() {
+            const filename = document.getElementById('saveFilename').value.trim();
+            if (filename) {
+                Puffy.requestCloudSave(filename, 'onCloudSaveLoaded');
+            }
+        }
+
+        function cloudDelete() {
+            const filename = document.getElementById('saveFilename').value.trim();
+            if (filename) {
+                Puffy.removeCloudSave(filename);
+            }
+        }
+
+        // Input status tracking
+        let mouseTimeout, keyboardTimeout;
+
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('mouseStatus').classList.add('active');
+            document.getElementById('mousePos').textContent = `${e.clientX}, ${e.clientY}`;
+            clearTimeout(mouseTimeout);
+            mouseTimeout = setTimeout(() => {
+                document.getElementById('mouseStatus').classList.remove('active');
+            }, 200);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            document.getElementById('keyboardStatus').classList.add('active');
+            document.getElementById('lastKey').textContent = e.key;
+            clearTimeout(keyboardTimeout);
+            keyboardTimeout = setTimeout(() => {
+                document.getElementById('keyboardStatus').classList.remove('active');
+            }, 200);
+        });
+
+        // Gamepad detection (the native engine handles actual gamepad input)
+        function checkGamepad() {
+            const gamepads = navigator.getGamepads();
+            const hasGamepad = gamepads && Array.from(gamepads).some(gp => gp !== null);
+            document.getElementById('gamepadStatus').classList.toggle('active', hasGamepad);
+        }
+
+        window.addEventListener('gamepadconnected', () => {
+            log('Gamepad connected', 'success');
+            checkGamepad();
+        });
+
+        window.addEventListener('gamepaddisconnected', () => {
+            log('Gamepad disconnected', 'info');
+            checkGamepad();
+        });
+
+        setInterval(checkGamepad, 1000);
+
+        // Startup message
+        log('PuffyEngine Demo initialized', 'success');
+        log('Use the controls above to test engine features', 'info');
+    </script>
+</body>
+
+</html>
